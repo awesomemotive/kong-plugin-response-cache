@@ -120,6 +120,9 @@ function plugin:access(conf)
 	local uri = ngx.var.uri
 	if not cacheable_request(req_get_method(), uri, conf) then
 		ngx.log(ngx.NOTICE, "not cacheable")
+		ngx.status = 400
+		ngx.say("not cacheable")
+		ngx.exit(400)
 		return
 	end
 
