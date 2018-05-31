@@ -10,11 +10,10 @@ local cjson_decode = require("cjson").decode
 local cjson_encode = require("cjson").encode
 
 local function cacheable_request(method, uri, conf)
-	ngx.say(method)
 	if method ~= "GET" then
 		return false
 	end
-	ngx.say(uri)
+
 	for _,v in ipairs(conf.cache_policy.uris) do
 		if string.match(uri, "^"..v.."$") then
 			return true
@@ -121,23 +120,14 @@ function plugin:access(conf)
 	local uri = ngx.var.uri
 	if not cacheable_request(req_get_method(), uri, conf) then
 		ngx.log(ngx.NOTICE, "not cacheable")
-		ngx.status = 400
-		ngx.say("not cacheable")
-		ngx.exit(400)
 		return
 	end
 
 	local cache_key = get_cache_key(uri, ngx.req.get_headers(), ngx.req.get_uri_args(), conf)
 	local red, err = connect_to_redis(conf)
 	if err then
-		ngx.status = 400
-		ngx.say("failed to connect to Redis: ", err)
-		ngx.exit(400)
+		ngx.log(ngx.ERR, "failed to connect to Redis: ", err)
 		return
-	else
-		ngx.status = 400
-		ngx.say("connected")
-		ngx.exit(400)
 	end
 
 	local cached_val, err = red:get(cache_key)
