@@ -96,7 +96,7 @@ end
 local function red_set(premature, key, val, conf)
 	local red, err = connect_to_redis(conf)
 	if err then
-			ngx_log(ngx.ERR, "failed to connect to Redis: ", err)
+		ngx.log(ngx.ERR, "failed to connect to Redis: ", err)
 	end
 
 	red:init_pipeline()
@@ -106,7 +106,7 @@ local function red_set(premature, key, val, conf)
 	end
 	local results, err = red:commit_pipeline()
 	if err then
-		ngx_log(ngx.ERR, "failed to commit the pipelined requests: ", err)
+		ngx.log(ngx.ERR, "failed to commit the pipelined requests: ", err)
 	end
 end
 
@@ -126,7 +126,7 @@ function plugin:access(conf)
 	local cache_key = get_cache_key(uri, ngx.req.get_headers(), ngx.req.get_uri_args(), conf)
 	local red, err = connect_to_redis(conf)
 	if err then
-		ngx_log(ngx.ERR, "failed to connect to Redis: ", err)
+		ngx.log(ngx.ERR, "failed to connect to Redis: ", err)
 		return
 	end
 
