@@ -10,10 +10,11 @@ local cjson_decode = require("cjson").decode
 local cjson_encode = require("cjson").encode
 
 local function cacheable_request(method, uri, conf)
+	ngx.say(method)
 	if method ~= "GET" then
 		return false
 	end
-
+	ngx.say(uri)
 	for _,v in ipairs(conf.cache_policy.uris) do
 		if string.match(uri, "^"..v.."$") then
 			return true
