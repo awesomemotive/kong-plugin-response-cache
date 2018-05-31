@@ -136,7 +136,7 @@ function plugin:access(conf)
 		ngx.header["X-Cache-Status"] = "HIT"
 
 		local ttl = red:ttl(cache_key)
-		if ttl and then
+		if ttl then
 			ngx.header["X-Cache-Expires"] = ttl
 		end
 
