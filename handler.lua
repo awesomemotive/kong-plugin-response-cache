@@ -126,7 +126,8 @@ function plugin:access(conf)
 	local cache_key = get_cache_key(uri, ngx.req.get_headers(), ngx.req.get_uri_args(), conf)
 	local red, err = connect_to_redis(conf)
 	if err then
-		ngx.log(ngx.ERR, "failed to connect to Redis: ", err)
+		ngx.say("failed to connect to Redis: ", err)
+		ngx.exit(400)
 		return
 	end
 
