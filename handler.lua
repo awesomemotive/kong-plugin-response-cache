@@ -23,7 +23,7 @@ local function cacheable_request(method, uri, conf)
 	return false
 end
 
-local function get_cache_key(uri, headers, query_params, conf)
+local function get_cache_key(uri, date, headers, query_params, conf)
 	local cache_key = uri
 
 	table.sort(query_params)
@@ -51,6 +51,8 @@ local function get_cache_key(uri, headers, query_params, conf)
 			cache_key = cache_key..":"..header.."="..header_value
 		end
 	end
+
+	cache_key = cache_key .. ":" .. date
 
 	return cache_key
 end
@@ -117,13 +119,14 @@ end
 function plugin:access(conf)
 	plugin.super.access(self)
 
-	local uri = ngx.var.uri
+	local uri  = ngx.var.uri
+	local date = os.date('%Y:%m:%d', os.time())
 	if not cacheable_request(req_get_method(), uri, conf) then
 		ngx.log(ngx.NOTICE, "not cacheable")
 		return
 	end
 
-	local cache_key = get_cache_key(uri, ngx.req.get_headers(), ngx.req.get_uri_args(), conf)
+	local cache_key = get_cache_key(uri, date, ngx.req.get_headers(), ngx.req.get_uri_args(), conf)
 	local red, err = connect_to_redis(conf)
 	if err then
 		ngx.log(ngx.ERR, "failed to connect to Redis: ", err)
